@@ -1,5 +1,6 @@
 package io.horizontalsystems.bitcoincore.models
 
+import android.util.Log
 import io.horizontalsystems.bitcoincore.extensions.hexToByteArray
 import io.horizontalsystems.bitcoincore.io.BitcoinInput
 import io.horizontalsystems.bitcoincore.storage.BlockHeader
@@ -12,7 +13,11 @@ class Checkpoint(fileName: String) {
     val additionalBlocks: List<Block>
 
     init {
+        Log.e("AAA", "fileName: $fileName")
+        Log.e("AAA", "javaClass.classLoader: ${javaClass.classLoader}")
         val stream = javaClass.classLoader?.getResourceAsStream(fileName)
+        Log.e("AAA", "stream: $stream")
+
         val inputStreamReader: Reader = InputStreamReader(stream)
         val reader = BufferedReader(inputStreamReader)
         val checkpoints = reader.readLines()
