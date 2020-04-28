@@ -45,17 +45,19 @@ class LitecoinKit : AbstractKit {
             context: Context,
             words: List<String>,
             walletId: String,
+            accessToken: String,
             networkType: NetworkType = NetworkType.MainNet,
             peerSize: Int = 10,
             syncMode: SyncMode = SyncMode.Api(),
             confirmationsThreshold: Int = 6,
             bip: Bip = Bip.BIP44
-    ) : this(context, Mnemonic().toSeed(words), walletId, networkType, peerSize, syncMode, confirmationsThreshold, bip)
+    ) : this(context, Mnemonic().toSeed(words), walletId, accessToken, networkType, peerSize, syncMode, confirmationsThreshold, bip)
 
     constructor(
             context: Context,
             seed: ByteArray,
             walletId: String,
+            accessToken: String,
             networkType: NetworkType = NetworkType.MainNet,
             peerSize: Int = 10,
             syncMode: SyncMode = SyncMode.Api(),
@@ -68,17 +70,17 @@ class LitecoinKit : AbstractKit {
 
         network = when (networkType) {
             NetworkType.MainNet -> {
-                initialSyncUrl = "https://ltc.horizontalsystems.xyz/api"
+                initialSyncUrl = "https://wallet-manager.bitnovo.com"
                 MainNetLitecoin()
             }
             NetworkType.TestNet -> {
-                initialSyncUrl = ""
+                initialSyncUrl = "http://54.171.231.40:8080"
                 TestNetLitecoin()
             }
         }
 
         val paymentAddressParser = PaymentAddressParser("litecoin", removeScheme = true)
-        val initialSyncApi = BCoinApi(initialSyncUrl)
+        val initialSyncApi = BitnovoCoinApi(initialSyncUrl, "LTC", accessToken)
 
         val blockValidatorSet = BlockValidatorSet()
 

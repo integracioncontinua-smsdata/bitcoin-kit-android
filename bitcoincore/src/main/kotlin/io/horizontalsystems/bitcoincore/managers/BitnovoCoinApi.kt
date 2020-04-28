@@ -1,12 +1,18 @@
 package io.horizontalsystems.bitcoincore.managers
 
+import android.util.Base64
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import io.horizontalsystems.bitcoincore.core.IInitialSyncApi
+import io.horizontalsystems.bitcoincore.utils.HashUtils
 import java.util.*
 import java.util.logging.Logger
 
-class BitnovoCoinApi(host: String, val accessToken: String) : IInitialSyncApi {
+class BitnovoCoinApi(
+        host: String,
+        private val coin: String,
+        private val accessToken: String
+) : IInitialSyncApi {
     private val apiManager = ApiManager(host)
     private val logger = Logger.getLogger("BitnovoCoinApi")
 
@@ -17,7 +23,7 @@ class BitnovoCoinApi(host: String, val accessToken: String) : IInitialSyncApi {
 
         logger.info("Request transactions for ${addresses.size} addresses: [${addresses.first()}, ...]")
 
-        val response = apiManager.post("", requestData.toString()).asArray()
+        val response = apiManager.post("/api/v1/wallets/$coin/tx/", requestData.toString(), authToken()).asArray()
 
         logger.info("Got ${response.size()} transactions for requested addresses")
 
@@ -47,10 +53,11 @@ class BitnovoCoinApi(host: String, val accessToken: String) : IInitialSyncApi {
         return transactions
     }
 
-    fun authToken(): String {
-        val now = Date().time
-        val hash = ""
-        return "Token $now:$hash"
+    private fun authToken(): String {
+        val now = Date().time / 1000
+        val sha256 = HashUtils.sha256(accessToken.toByteArray())
+        val base64 = Base64.encode(sha256, Base64.NO_WRAP)
+        return "Token $now:$base64"
     }
 
 }

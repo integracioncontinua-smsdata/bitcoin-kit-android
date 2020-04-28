@@ -17,6 +17,7 @@ import io.horizontalsystems.bitcoincore.blocks.validators.LegacyDifficultyAdjust
 import io.horizontalsystems.bitcoincore.blocks.validators.ProofOfWorkValidator
 import io.horizontalsystems.bitcoincore.extensions.toReversedByteArray
 import io.horizontalsystems.bitcoincore.managers.Bip44RestoreKeyConverter
+import io.horizontalsystems.bitcoincore.managers.BitnovoCoinApi
 import io.horizontalsystems.bitcoincore.managers.InsightApi
 import io.horizontalsystems.bitcoincore.models.TransactionInfo
 import io.horizontalsystems.bitcoincore.network.Network
@@ -49,16 +50,18 @@ class BitcoinCashKit : AbstractKit {
             context: Context,
             words: List<String>,
             walletId: String,
+            accessToken: String,
             networkType: NetworkType = NetworkType.MainNet,
             peerSize: Int = 10,
             syncMode: SyncMode = SyncMode.Api(),
             confirmationsThreshold: Int = 6
-    ) : this(context, Mnemonic().toSeed(words), walletId, networkType, peerSize, syncMode, confirmationsThreshold)
+    ) : this(context, Mnemonic().toSeed(words), walletId, accessToken, networkType, peerSize, syncMode, confirmationsThreshold)
 
     constructor(
             context: Context,
             seed: ByteArray,
             walletId: String,
+            accessToken: String,
             networkType: NetworkType = NetworkType.MainNet,
             peerSize: Int = 10,
             syncMode: SyncMode = SyncMode.Api(),
@@ -70,17 +73,17 @@ class BitcoinCashKit : AbstractKit {
 
         network = when (networkType) {
             NetworkType.MainNet -> {
-                initialSyncUrl = "https://cashexplorer.bitcoin.com/api"
+                initialSyncUrl = "https://wallet-manager.bitnovo.com"
                 MainNetBitcoinCash()
             }
             NetworkType.TestNet -> {
-                initialSyncUrl = "https://tbch.blockdozer.com/api"
+                initialSyncUrl = "http://54.171.231.40:8080"
                 TestNetBitcoinCash()
             }
         }
 
         val paymentAddressParser = PaymentAddressParser("bitcoincash", removeScheme = false)
-        val initialSyncApi = InsightApi(initialSyncUrl)
+        val initialSyncApi = BitnovoCoinApi(initialSyncUrl, "BCH", accessToken)
 
         val blockValidatorSet = BlockValidatorSet()
         blockValidatorSet.addBlockValidator(ProofOfWorkValidator())

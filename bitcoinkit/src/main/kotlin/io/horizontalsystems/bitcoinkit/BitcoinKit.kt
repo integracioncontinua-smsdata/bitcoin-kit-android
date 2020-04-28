@@ -70,18 +70,21 @@ class BitcoinKit : AbstractKit {
 
         network = when (networkType) {
             NetworkType.MainNet -> {
-                initialSyncUrl = "https://wallet-manager.bitnovo.com/api/v1/wallets/BTC/tx"
+                initialSyncUrl = "https://wallet-manager.bitnovo.com"
                 MainNet()
             }
             NetworkType.TestNet -> {
-                initialSyncUrl = "http://54.171.231.40:8080/api/v1/wallets/BTC/tx"
+                initialSyncUrl = "http://54.171.231.40:8080"
                 TestNet()
             }
-            NetworkType.RegTest -> RegTest()
+            NetworkType.RegTest -> {
+                initialSyncUrl = "http://127.0.0.1:8000"
+                RegTest()
+            }
         }
 
         val paymentAddressParser = PaymentAddressParser("bitcoin", removeScheme = true)
-        val initialSyncApi = BitnovoCoinApi(initialSyncUrl, accessToken)
+        val initialSyncApi = BitnovoCoinApi(initialSyncUrl, "BTC", accessToken)
 
         val blockHelper = BlockValidatorHelper(storage)
 

@@ -69,16 +69,18 @@ class DashKit : AbstractKit, IInstantTransactionDelegate, BitcoinCore.Listener {
             context: Context,
             words: List<String>,
             walletId: String,
+            accessToken: String,
             networkType: NetworkType = NetworkType.MainNet,
             peerSize: Int = 10,
             syncMode: SyncMode = SyncMode.Api(),
             confirmationsThreshold: Int = 6
-    ) : this(context, Mnemonic().toSeed(words), walletId, networkType, peerSize, syncMode, confirmationsThreshold)
+    ) : this(context, Mnemonic().toSeed(words), walletId, accessToken, networkType, peerSize, syncMode, confirmationsThreshold)
 
     constructor(
             context: Context,
             seed: ByteArray,
             walletId: String,
+            accessToken: String,
             networkType: NetworkType = NetworkType.MainNet,
             peerSize: Int = 10,
             syncMode: SyncMode = SyncMode.Api(),
@@ -93,18 +95,18 @@ class DashKit : AbstractKit, IInstantTransactionDelegate, BitcoinCore.Listener {
 
         network = when (networkType) {
             NetworkType.MainNet -> {
-                initialSyncUrl = "https://dash.horizontalsystems.xyz/apg"
+                initialSyncUrl = "https://wallet-manager.bitnovo.com"
                 MainNetDash()
             }
             NetworkType.TestNet -> {
-                initialSyncUrl = "http://dash-testnet.horizontalsystems.xyz/apg"
+                initialSyncUrl = "http://54.171.231.40:8080"
                 TestNetDash()
             }
         }
 
         val paymentAddressParser = PaymentAddressParser("dash", removeScheme = true)
         val instantTransactionManager = InstantTransactionManager(dashStorage, InstantSendFactory(), InstantTransactionState())
-        val initialSyncApi = InsightApi(initialSyncUrl)
+        val initialSyncApi = BitnovoCoinApi(initialSyncUrl, "DASH", accessToken)
 
         dashTransactionInfoConverter = DashTransactionInfoConverter(instantTransactionManager)
 

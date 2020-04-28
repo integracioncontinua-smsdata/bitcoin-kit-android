@@ -40,6 +40,7 @@ class MainViewModel : ViewModel(), BitcoinKit.Listener {
     private lateinit var bitcoinKit: BitcoinKit
 
     private val walletId = "MyWallet"
+    private val accessToken = "jZilhuyhSpsvwes4KCKoUi9y00LPx7hbe2SKHmCmb9ZEELejMO"
     private val networkType = BitcoinKit.NetworkType.MainNet
     private val syncMode = BitcoinCore.SyncMode.Api()
     private val bip = Bip.BIP44
@@ -47,7 +48,7 @@ class MainViewModel : ViewModel(), BitcoinKit.Listener {
     fun init() {
         val words = "used ugly meat glad balance divorce inner artwork hire invest already piano".split(" ")
 
-        bitcoinKit = BitcoinKit(App.instance, words, walletId, networkType, syncMode = syncMode, bip = bip)
+        bitcoinKit = BitcoinKit(App.instance, words, walletId, accessToken, networkType, syncMode = syncMode, bip = bip)
 
         bitcoinKit.listener = this
 
