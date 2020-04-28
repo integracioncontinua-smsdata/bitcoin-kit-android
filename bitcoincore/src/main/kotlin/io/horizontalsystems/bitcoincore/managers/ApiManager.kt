@@ -40,7 +40,7 @@ class ApiManager(private val host: String) {
     }
 
     @Throws
-    fun post(resource: String, data: String): JsonValue {
+    fun post(resource: String, data: String, token: String? = null): JsonValue {
         try {
             val path = "$host/$resource"
 
@@ -48,6 +48,9 @@ class ApiManager(private val host: String) {
 
             val url = URL(path)
             val urlConnection = url.openConnection() as HttpURLConnection
+            if (token!=null) {
+                urlConnection.setRequestProperty("Authorization", token)
+            }
             urlConnection.requestMethod = "POST"
             val out = BufferedOutputStream(urlConnection.outputStream)
             val writer = BufferedWriter(OutputStreamWriter(out, "UTF-8"))

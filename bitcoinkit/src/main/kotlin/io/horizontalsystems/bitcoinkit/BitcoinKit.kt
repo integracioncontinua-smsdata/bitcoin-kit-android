@@ -43,17 +43,21 @@ class BitcoinKit : AbstractKit {
             context: Context,
             words: List<String>,
             walletId: String,
+            accessToken: String,
             networkType: NetworkType = NetworkType.MainNet,
             peerSize: Int = 10,
             syncMode: SyncMode = SyncMode.Api(),
             confirmationsThreshold: Int = 6,
             bip: Bip = Bip.BIP44
-    ) : this(context, Mnemonic().toSeed(words), walletId, networkType, peerSize, syncMode, confirmationsThreshold, bip)
+    ) : this(context, Mnemonic().toSeed(words), walletId, accessToken, networkType, peerSize,
+            syncMode,
+            confirmationsThreshold, bip)
 
     constructor(
             context: Context,
             seed: ByteArray,
             walletId: String,
+            accessToken: String,
             networkType: NetworkType = NetworkType.MainNet,
             peerSize: Int = 10,
             syncMode: SyncMode = SyncMode.Api(),
@@ -66,18 +70,18 @@ class BitcoinKit : AbstractKit {
 
         network = when (networkType) {
             NetworkType.MainNet -> {
-                initialSyncUrl = "https://btc.horizontalsystems.xyz/apg"
+                initialSyncUrl = "https://wallet-manager.bitnovo.com/api/v1/wallets/BTC/tx"
                 MainNet()
             }
             NetworkType.TestNet -> {
-                initialSyncUrl = "https://btc-testnet.horizontalsystems.xyz/api"
+                initialSyncUrl = "http://54.171.231.40:8080/api/v1/wallets/BTC/tx"
                 TestNet()
             }
             NetworkType.RegTest -> RegTest()
         }
 
         val paymentAddressParser = PaymentAddressParser("bitcoin", removeScheme = true)
-        val initialSyncApi = BCoinApi(initialSyncUrl)
+        val initialSyncApi = BitnovoCoinApi(initialSyncUrl, accessToken)
 
         val blockHelper = BlockValidatorHelper(storage)
 
