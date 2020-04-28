@@ -17,39 +17,44 @@ class BitnovoCoinApi(
     private val logger = Logger.getLogger("BitnovoCoinApi")
 
     override fun getTransactions(addresses: List<String>): List<TransactionItem> {
-        val requestData = JsonObject().apply {
-            this["addresses"] = Json.array(*addresses.toTypedArray())
-        }
-
         logger.info("Request transactions for ${addresses.size} addresses: [${addresses.first()}, ...]")
 
-        val response = apiManager.post("api/v1/wallets/$coin/tx/", requestData.toString(), authToken()).asArray()
-
-        logger.info("Got ${response.size()} transactions for requested addresses")
-
+        fun min(a: Int, b: Int) = if (a < b) a else b
         val transactions = mutableListOf<TransactionItem>()
-
-        for (txItem in response) {
-            val tx = txItem.asObject()
-
-            val blockHashJson = tx["block"] ?: continue
-            val blockHash = if (blockHashJson.isString) blockHashJson.asString() else continue
-
-            val outputs = mutableListOf<TransactionOutputItem>()
-            for (outputItem in tx["outputs"].asArray()) {
-                val outputJson = outputItem.asObject()
-
-                val scriptJson = outputJson["script"] ?: continue
-                val addressJson = outputJson["address"] ?: continue
-
-                if (scriptJson.isString && addressJson.isString) {
-                    outputs.add(TransactionOutputItem(scriptJson.asString(), addressJson.asString()))
-                }
+        var current = 0
+        val maxSize = 20
+        while (current < addresses.size) {
+            val size = min(maxSize, addresses.size - current)
+            val currentAddresses = addresses.slice(current until size)
+            val requestData = JsonObject().apply {
+                this["addresses"] = Json.array(*currentAddresses.toTypedArray())
             }
+            val response = apiManager.post("api/v1/wallets/$coin/tx/", requestData.toString(), authToken()).asArray()
 
-            transactions.add(TransactionItem(blockHash, tx["height"].asInt(), outputs))
+            logger.info("Got ${response.size()} transactions for requested addresses")
+
+            for (txItem in response) {
+                val tx = txItem.asObject()
+
+                val blockHashJson = tx["block"] ?: continue
+                val blockHash = if (blockHashJson.isString) blockHashJson.asString() else continue
+
+                val outputs = mutableListOf<TransactionOutputItem>()
+                for (outputItem in tx["outputs"].asArray()) {
+                    val outputJson = outputItem.asObject()
+
+                    val scriptJson = outputJson["script"] ?: continue
+                    val addressJson = outputJson["address"] ?: continue
+
+                    if (scriptJson.isString && addressJson.isString) {
+                        outputs.add(TransactionOutputItem(scriptJson.asString(), addressJson.asString()))
+                    }
+                }
+
+                transactions.add(TransactionItem(blockHash, tx["height"].asInt(), outputs))
+            }
+            current += size
         }
-
         return transactions
     }
 
