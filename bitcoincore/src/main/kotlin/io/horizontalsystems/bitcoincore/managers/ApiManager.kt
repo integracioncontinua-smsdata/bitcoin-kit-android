@@ -48,9 +48,10 @@ class ApiManager(private val host: String) {
 
             val url = URL(path)
             val urlConnection = url.openConnection() as HttpURLConnection
-            if (token!=null) {
+            if (token != null) {
                 urlConnection.setRequestProperty("Authorization", token)
             }
+            urlConnection.setRequestProperty("Content-Type", "application/json")
             urlConnection.requestMethod = "POST"
             val out = BufferedOutputStream(urlConnection.outputStream)
             val writer = BufferedWriter(OutputStreamWriter(out, "UTF-8"))
@@ -63,6 +64,7 @@ class ApiManager(private val host: String) {
                 Json.parse(it.bufferedReader())
             }
         } catch (exception: IOException) {
+            exception.printStackTrace()
             throw Exception("${exception.javaClass.simpleName}: $host")
         }
     }

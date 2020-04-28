@@ -40,7 +40,7 @@ class MainViewModel : ViewModel(), BitcoinKit.Listener {
     private lateinit var bitcoinKit: BitcoinKit
 
     private val walletId = "MyWallet"
-    private val accessToken = "jZilhuyhSpsvwes4KCKoUi9y00LPx7hbe2SKHmCmb9ZEELejMO"
+    private val accessToken = "MoB4rSXfD53ZH4JKvEwhHwBFmu6GihQAgpRXArRSSSY3cNTt5HNkCph7vaMQCv2SD2nHG0b8tibexQR1"
     private val networkType = BitcoinKit.NetworkType.MainNet
     private val syncMode = BitcoinCore.SyncMode.Api()
     private val bip = Bip.BIP44

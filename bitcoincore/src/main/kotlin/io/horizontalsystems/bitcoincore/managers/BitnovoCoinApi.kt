@@ -23,7 +23,7 @@ class BitnovoCoinApi(
 
         logger.info("Request transactions for ${addresses.size} addresses: [${addresses.first()}, ...]")
 
-        val response = apiManager.post("/api/v1/wallets/$coin/tx/", requestData.toString(), authToken()).asArray()
+        val response = apiManager.post("api/v1/wallets/$coin/tx/", requestData.toString(), authToken()).asArray()
 
         logger.info("Got ${response.size()} transactions for requested addresses")
 
@@ -55,9 +55,9 @@ class BitnovoCoinApi(
 
     private fun authToken(): String {
         val now = Date().time / 1000
-        val sha256 = HashUtils.sha256(accessToken.toByteArray())
-        val base64 = Base64.encode(sha256, Base64.NO_WRAP)
-        return "Token $now:$base64"
+        val secretHash = HashUtils.sha256("$accessToken$now".toByteArray())
+        val base64Hash = Base64.encodeToString(secretHash, Base64.NO_WRAP)
+        return "Token $now:$base64Hash"
     }
 
 }
